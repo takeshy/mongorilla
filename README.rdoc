@@ -4,33 +4,33 @@ mongorilla is very small Object Document Mapper for mongo.
 mongorilla can update atomic  with condition.
 mongorilla accept single server or Master/Slave or Replica Set
 
-=== syntax
+=== sample
   Mongorilla::Collection.build("/var/www/mongo_config.yml") #only one time when boot
   class User 
     UserFields = [:_id,:name,:password,:logs,:log_count]
     include Mongorilla::Document
   end
   user = User.create(:name => "morita",:password => "pass")
-  u = User.find(@user.id)   # find by id
+  u = User.find(user.id)   # find by id
   u = User.find({:name => "morita"},:master=>true)[0] #find user named morita for master db (if you want avoid slave time lag)
-  user.password = "hello"   #change attribute whithout update db yet 
-  user.push("logs","ooooo") #$push whithout update db yet 
-  user.inc("log_count",1)   #$inc whithout update db yet 
-  user.save                 #update above change to db
-  user.push("logs","bb")    #$push whithout update db yet 
-  user.push("logs","cc")    #$push whithout update db yet 
-  p user.logs               # ["ooooo","bb","cc"]
-  user.inc("log_count",2)   #$inc +2 whithout update db yet 
-  p user.log_count          # 3
-  ret = user.save({:log_count => {"$lt" => 1}},Mongorilla::Document::SYNC) #update was failed because log_count was 1.
-  p ret                     # false
-  p user.logs               # ["ooooo"]
-  p user.log_count          # 1
-  user.pull("logs","ooooo") #$pull whithout update db yet 
-  p user.logs               #["ooooo"] $pull is not reflect object because pull can be complex when embedded or $gt etc.
-  ret = user.save(Mongorilla::Document::RELOAD) #update success and reflect object because reload was specified.
-  p ret                     #true
-  p user.logs               # []                    
+  u.password = "hello"   #change attribute whithout update db yet 
+  u.push("logs","ooooo") #$push whithout update db yet 
+  u.inc("log_count",1)   #$inc whithout update db yet 
+  u.save                 #update above change to db
+  u.push("logs","bb")    #$push whithout update db yet 
+  u.push("logs","cc")    #$push whithout update db yet 
+  p u.logs               # ["ooooo","bb","cc"]
+  u.inc("log_count",2)   #$inc +2 whithout update db yet 
+  p u.log_count          # 3
+  ret = u.save({:log_count => {"$lt" => 1}},Mongorilla::Document::SYNC) #update failed because log_count was 1.
+  p ret                  # false
+  p u.logs               # ["ooooo"]
+  p u.log_count          # 1
+  u.pull("logs","ooooo") #$pull whithout update db yet 
+  p u.logs               #["ooooo"] $pull is not reflect object because pull can be complex when embedded or $gt etc.
+  ret = u.save(Mongorilla::Document::RELOAD) #update success and reflect object because reload was specified.
+  p ret                  #true
+  p user.logs            # []                    
 
 === config
   #single server
@@ -53,6 +53,125 @@ mongorilla accept single server or Master/Slave or Replica Set
     - -  localhost
       -  27018
   database: dev
+
+=== syntax
+  1. Connect Server below statement when boot application
+    Mongorilla::Collection.build("/var/www/mongo_config.yml")
+  2. create document class and define constant class name + Fields with document fields and include Mongorilla::Document.
+    class Class
+      ClassNameFields = [:_id,...]
+      include Mongorilla::Document
+    end
+
+==== Class.create(attributes)
+  args:
+    attributes     hash for document
+
+  description:
+    set attributes to db and return new Object
+
+==== Class.collection
+  description:
+    get mongodb collection
+
+=== Class.find_one(cond,opt)
+  args:
+    cond    condition {:logcount => {"$gt" => 2}} etc. 
+    opt     option master => true then find master db other option see mongo driver  {:master => true,:fields => [:name]} etc.
+  description:
+    find one match object. if not exitst,return nil
+
+=== Class.find(cond,opt)
+  args:
+    cond    condition {:logcount => {"$gt" => 2}} etc. if cond is String or BSON::ObjectId then search _id and return one object.
+    opt     option master => true then find master db other option see mongo driver  {:master => true,:fields => [:name]} etc.
+  description:
+    return  match objects array. if not exitst,return nil
+
+=== #set(k,v)
+  args:
+    k   field name for $set
+    v   value for $set
+  description:
+    modify object attribute and modify @change for save. this method does not reflect db.
+  
+=== #inc(k,v)
+  args:
+    k   field name for $inc
+    v   amount for $inc. it is possible less than 0.
+  description:
+    modify object attribute and modify @change for save. this method does not reflect db.
+
+=== #push(k,v)
+  args:
+    k   field name for $push
+    v   value for $push
+  description:
+    modify object attribute and modify @change for save. this method does not reflect db.
+
+=== #unset(k)
+  args:
+    k   field name for $unset
+  description:
+    modify object attribute and modify @change for save. this method does not reflect db.
+
+=== #push_all(k,v)
+  args:
+    k   field name for $pushAll
+    v   value for $pushAll
+  description:
+    modify object attribute and modify @change for save. this method does not reflect db.
+
+=== #add_to_set(k,v)
+  args:
+    k   field name for $addToSet
+    v   value for $addToSet
+  description:
+    modify object attribute and modify @change for save. this method does not reflect db.
+
+=== #pop(k,v)
+  args:
+    k   field name for $pop
+    v   value if less than 0 remove first else remove tail
+  description:
+    modify object attribute and modify @change for save. this method does not reflect db.
+
+=== #pull(k,v)
+  args:
+    k   field name for $pull
+    v   value for $pull
+  description:
+    modify @change for save. this method does not reflect object and db.
+
+=== #pull_all(k,v)
+  args:
+    k   field name for $pullAll
+    v   value for $pullAll
+  description:
+    modify @change for save. this method does not reflect object and db.
+
+=== #save(cond,opt,mode)
+  args:
+    cond  condition(optional) {:count => {$lt => 20}} etc.
+    opt   option(optional) see mongdb driver {:upsert => true} etc.
+    mode  Mongorilla::Document::SYNC(default) or Mongorilla::Document::ASYNC or Mongorilla::Document::RELOAD
+          SYNC  is specified,check result,RELOAD is specified,check result and fetch update record from db,
+          ASYNC is specified,does not check result.
+
+  description:
+    reflect @change to DB
+
+=== #delete
+  description:
+    remove object from db
+
+=== #reset
+  description:
+    discard @changes and reset object to original
+
+=== #reload
+  description:
+    fetch record from db.
 
 == Contributing to mongorilla
 
