@@ -17,10 +17,11 @@ Jeweler::Tasks.new do |gem|
   gem.name = "mongorilla"
   gem.homepage = "http://github.com/takeshy/mongorilla"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "morita@ibrains.co.jp"
+  gem.summary = "Small Object Document Mapper for Mongo"
+  gem.description = "Small Object Document Mapper for Mongo. you can update atomic  with condition"
+  gem.email = "laten@nifty.com"
   gem.authors = ["Takeshi Morita"]
+  gem.files = ["lib/mongorilla.rb","lib/**/*.rb"]
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
@@ -28,11 +29,11 @@ Jeweler::RubygemsDotOrgTasks.new
 require 'rspec/core'
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |spec|
-  spec.pattern = FileList['spec/**/*_spec.rb']
+  spec.pattern = FileList['spec/*_spec.rb']
 end
 
 RSpec::Core::RakeTask.new(:rcov) do |spec|
-  spec.pattern = 'spec/**/*_spec.rb'
+  spec.pattern = 'spec/*_spec.rb'
   spec.rcov = true
 end
 

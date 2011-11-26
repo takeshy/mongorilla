@@ -1,9 +1,61 @@
 = mongorilla
 
-Description goes here.
+mongorilla is very small Object Document Mapper for mongo.
+mongorilla can update atomic  with condition.
+mongorilla accept single server or Master/Slave or Replica Set
+
+=== syntax
+Mongorilla::Collection.build("/var/www/mongo_config.yml") #only one time when boot
+class User 
+  UserFields = [:_id,:name,:password,:logs,:log_count]
+  include Mongorilla::Document
+end
+user = User.create(:name => "morita",:password => "pass")
+u = User.find(@user.id)   # find by id
+u = User.find({:name => "morita"},:master=>true)[0] #find user named morita for master db (if you want avoid slave time lag)
+user.password = "hello"   #change attribute whithout update db yet 
+user.push("logs","ooooo") #$push whithout update db yet 
+user.inc("log_count",1)   #$inc whithout update db yet 
+user.save                 #update above change to db
+user.push("logs","bb")    #$push whithout update db yet 
+user.push("logs","cc")    #$push whithout update db yet 
+p user.logs               # ["ooooo","bb","cc"]
+user.inc("log_count",2)   #$inc +2 whithout update db yet 
+p user.log_count          # 3
+ret = user.save({:log_count => {"$lt" => 1}},Mongorilla::Document::SYNC) #update was failed because log_count was 1.
+p ret                     # false
+p user.logs               # ["ooooo"]
+p user.log_count          # 1
+user.pull("logs","ooooo") #$pull whithout update db yet 
+p user.logs               #["ooooo"] $pull is not reflect object because pull can be complex when embedded or $gt etc.
+ret = user.save(Mongorilla::Document::RELOAD) #update success and reflect object because reload was specified.
+p ret                     #true
+p user.logs               # []                    
+
+=== config
+#single server
+host: localhost
+port: 27017
+database: dev
+
+#Master/Slave
+host: localhost
+port: 27017
+database: dev
+slaves:
+  - host: localhost
+    port: 27018
+
+#replica Set
+hosts
+  - -  localhost
+    -  27017
+  - -  localhost
+    -  27018
+database: dev
 
 == Contributing to mongorilla
- 
+
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project
@@ -16,4 +68,3 @@ Description goes here.
 
 Copyright (c) 2011 Takeshi Morita. See LICENSE.txt for
 further details.
-

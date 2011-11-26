@@ -1,0 +1,6 @@
+host: localhost
+port: 27017
+database: dev
+slaves:
+  - host: localhost
+    port: 27018
