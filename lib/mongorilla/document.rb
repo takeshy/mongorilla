@@ -175,10 +175,12 @@ module Mongorilla
           opt[:safe] = true
         end
         ret = @@col.insert(data,opt)
-        if ret.is_a? Array
-          ret.map{|uid| find(uid,:master=>true)}
-        elsif ret
-          find(ret,:master=>true)
+        if opt[:safe] == true
+          if ret.is_a? Array
+            ret.map{|uid| find(uid,:master=>true)}
+          elsif ret
+            find(ret,:master=>true)
+          end
         end
       end
 
