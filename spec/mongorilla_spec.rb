@@ -8,8 +8,7 @@ end
 
 describe User do
   before do
-    #Mongorilla::Collection.build(File.expand_path("../config.yml",__FILE__),Logger.new(STDOUT))
-    Mongorilla::Collection.build(File.expand_path("../config.yml",__FILE__))
+    Mongorilla::Collection.build(File.expand_path("../config.yml",__FILE__),Logger.new(STDOUT))
   end
   context "create" do
     before do

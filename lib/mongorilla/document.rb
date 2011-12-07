@@ -136,6 +136,7 @@ module Mongorilla
           end
         end
         opt[:safe] = true if [SYNC,RELOAD].include?(mode)
+        cond.merge!({"_id" => @doc["_id"]})
         if @changes
           ret = @@col.update(cond,@changes,opt)
           if opt[:safe] && ret["n"] != 1
