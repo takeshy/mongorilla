@@ -202,7 +202,7 @@ module Mongorilla
           find_one(cond,opt)
         else
           ret = @@col.find(cond,opt)
-          return nil if ret.count == 0
+          return [] if ret.count == 0
           ret.map{|r| self.new(r)}
         end
       end
