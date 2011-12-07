@@ -56,7 +56,8 @@ mongorilla accept single server or Master/Slave or Replica Set
 
 === syntax
   1. Connect Server below statement when boot application
-    Mongorilla::Collection.build("/var/www/mongo_config.yml")
+    Mongorilla::Collection.build("/var/www/mongo_config.yml",Logger.new("logfile.log"))
+    logger is option. if logger does not exist,Mongorilla does not output log.
   2. create document class and define constant class name + Fields with document fields and include Mongorilla::Document.
     class Class
       ClassNameFields = [:_id,...]

@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'logger'
 
 class User 
   UserFields = [:_id,:name,:password,:logs,:log_count]
@@ -7,6 +8,7 @@ end
 
 describe User do
   before do
+    #Mongorilla::Collection.build(File.expand_path("../config.yml",__FILE__),Logger.new(STDOUT))
     Mongorilla::Collection.build(File.expand_path("../config.yml",__FILE__))
   end
   context "create" do

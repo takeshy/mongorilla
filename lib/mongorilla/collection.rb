@@ -6,6 +6,7 @@ module Mongorilla
     @@slaves = nil
     @@slave_index = 0
     @@config = nil
+    @@loger = nil
 
     def self.master
       @@master
@@ -23,10 +24,11 @@ module Mongorilla
       @@config = YAML.load(File.read(path))
     end
 
-    def self.build(path=File.expand_path("../config.yml",__FILE__))
+    def self.build(path=File.expand_path("../config.yml",__FILE__),logger=nil)
       load_config(path)
       @@config["max_retries"] ||= 10
       @@config["meantime"] ||= 0.5
+      @@loger = logger
       if @@config["hosts"]
         @@master = Mongo::ReplSetConnection.new(*@@config["hosts"]).db(@@config["database"])
       elsif @@config["slaves"]
@@ -67,6 +69,7 @@ module Mongorilla
     end
 
     def count(cond={},opt={})
+      @@loger.info("count cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
       find(cond,opt).count
     end
 
@@ -78,6 +81,7 @@ module Mongorilla
           opt[:read] = :primary
         end
         rescue_connection_failure do
+          @@loger.info("find(master) cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
           w_col.find(cond,opt)
         end
       else
@@ -86,9 +90,11 @@ module Mongorilla
         end
         begin
           rescue_connection_failure do
+            @@loger.info("find(secondary) cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
             r_col.find(cond,opt)
           end
         rescue
+          @@loger.info("find(master) cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
           w_col.find(cond,opt)
         end
       end
@@ -96,12 +102,14 @@ module Mongorilla
 
     def insert(data,opt={})
       rescue_connection_failure do
+        @@loger.info("insert data:#{data.inspect} opt:#{opt.inspect}") if @@loger
         w_col.insert(data,opt)
       end
     end
 
     def update(cond,data,opt)
       rescue_connection_failure do
+        @@loger.info("update cond:#{cond.inspect} data:#{data.inspect} opt:#{opt.inspect}") if @@loger
         w_col.update(cond,data,opt)
       end
     end
@@ -113,6 +121,7 @@ module Mongorilla
         cond = {:_id => cond}
       end
       rescue_connection_failure do
+        @@loger.info("remove cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
         w_col.remove(cond,opt)
       end
     end
