@@ -6,6 +6,11 @@ class User
   include Mongorilla::Document
 end
 
+class Item
+  ItemFields = [:_id,:name,:price]
+  include Mongorilla::Document
+end
+
 describe User do
   before do
     Mongorilla::Collection.build(File.expand_path("../config.yml",__FILE__),Logger.new(STDOUT))
@@ -28,6 +33,7 @@ describe User do
     context "sync" do
       before do
         @user = User.create(:name => "morita",:password => "pass")
+        @item = Item.create(:name => "card",:price => 10)
         @user.name = "mora"
         @user.password = "hey"
         @user.push("logs","oooo")

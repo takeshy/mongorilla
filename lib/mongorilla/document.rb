@@ -36,7 +36,7 @@ module Mongorilla
       end
       alias_method :id,:_id
       col_name = pluralize(c.to_s)
-      @@col = Collection.new(col_name)
+      c.instance_variable_set("@col",Collection.new(col_name))
 
       def initialize(doc)
         @orig = doc.dup
@@ -138,7 +138,7 @@ module Mongorilla
         opt[:safe] = true if [SYNC,RELOAD].include?(mode)
         cond.merge!({"_id" => @doc["_id"]})
         if @changes
-          ret = @@col.update(cond,@changes,opt)
+          ret = self.class.collection.update(cond,@changes,opt)
           if opt[:safe] && ret["n"] != 1
             reset
             return false
@@ -163,19 +163,19 @@ module Mongorilla
 
       def reload
         @changes={}
-        @doc = @@col.find_one(id,:master => true)
+        @doc = self.class.collection.find_one(id,:master => true)
         @orig = @doc.dup
       end
 
       def c.collection
-        @@col
+        @col
       end
 
       def c.create(data,opt={})
         if opt == {}
           opt[:safe] = true
         end
-        ret = @@col.insert(data,opt)
+        ret = @col.insert(data,opt)
         if opt[:safe] == true
           if ret.is_a? Array
             ret.map{|uid| find(uid,:master=>true)}
@@ -186,7 +186,7 @@ module Mongorilla
       end
 
       def c.find_one(cond,opt={})
-        ret = @@col.find_one(cond,opt)
+        ret = @col.find_one(cond,opt)
         if ret
           return self.new(ret)
         else
@@ -195,25 +195,25 @@ module Mongorilla
       end
 
       def c.count(cond={},opt={})
-        @@col.count(cond,opt)
+        @col.count(cond,opt)
       end
 
       def c.find(cond={},opt={})
         if !cond.is_a? Hash
           find_one(cond,opt)
         else
-          ret = @@col.find(cond,opt)
+          ret = @col.find(cond,opt)
           return [] if ret.count == 0
           ret.map{|r| self.new(r)}
         end
       end
 
       def c.update(cond,data,opt={})
-        @@col.update(cond,data,opt)
+        @col.update(cond,data,opt)
       end
 
       def c.remove(cond={},opt={})
-        @@col.remove(cond,opt)
+        @col.remove(cond,opt)
       end
     end
   end

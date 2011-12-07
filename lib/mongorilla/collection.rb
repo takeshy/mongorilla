@@ -69,7 +69,7 @@ module Mongorilla
     end
 
     def count(cond={},opt={})
-      @@loger.info("count cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
+      @@loger.info("count #{@name} cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
       find(cond,opt).count
     end
 
@@ -81,7 +81,7 @@ module Mongorilla
           opt[:read] = :primary
         end
         rescue_connection_failure do
-          @@loger.info("find(master) cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
+          @@loger.info("find(master) #{@name} cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
           w_col.find(cond,opt)
         end
       else
@@ -90,11 +90,11 @@ module Mongorilla
         end
         begin
           rescue_connection_failure do
-            @@loger.info("find(secondary) cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
+            @@loger.info("find(secondary) #{@name} cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
             r_col.find(cond,opt)
           end
         rescue
-          @@loger.info("find(master) cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
+          @@loger.info("find(master) #{@name} cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
           w_col.find(cond,opt)
         end
       end
@@ -102,14 +102,14 @@ module Mongorilla
 
     def insert(data,opt={})
       rescue_connection_failure do
-        @@loger.info("insert data:#{data.inspect} opt:#{opt.inspect}") if @@loger
+        @@loger.info("insert #{@name} data:#{data.inspect} opt:#{opt.inspect}") if @@loger
         w_col.insert(data,opt)
       end
     end
 
     def update(cond,data,opt)
       rescue_connection_failure do
-        @@loger.info("update cond:#{cond.inspect} data:#{data.inspect} opt:#{opt.inspect}") if @@loger
+        @@loger.info("update #{@name} cond:#{cond.inspect} data:#{data.inspect} opt:#{opt.inspect}") if @@loger
         w_col.update(cond,data,opt)
       end
     end
@@ -121,7 +121,7 @@ module Mongorilla
         cond = {:_id => cond}
       end
       rescue_connection_failure do
-        @@loger.info("remove cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
+        @@loger.info("remove #{@name} cond:#{cond.inspect} opt:#{opt.inspect}") if @@loger
         w_col.remove(cond,opt)
       end
     end
