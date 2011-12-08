@@ -137,6 +137,11 @@ module Mongorilla
         end
         opt[:safe] = true if [SYNC,RELOAD].include?(mode)
         cond.merge!({"_id" => @doc["_id"]})
+        if @changes.keys.length == 0
+          Collection.output_log("warn","save no changed data cond:#{cond.inspect} orig:#{@orig.inspect} doc:#{@doc.inspect}")
+          reset
+          return false
+        end
         if @changes
           ret = self.class.collection.update(cond,@changes,opt)
           if opt[:safe] && ret["n"] != 1

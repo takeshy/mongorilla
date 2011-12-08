@@ -30,6 +30,15 @@ describe User do
     it{User.find({:name => "morita"},:master=>true)[0].name.should == "morita"}
   end
   context "save" do
+    context "no changed save" do
+      before do 
+        @user = User.create(:name => "morita",:password => "pass")
+        @user.save(Mongorilla::Document::RELOAD)
+      end
+      it "Does not excecute update" do
+        @user.name.should == "morita"
+      end
+    end
     context "sync" do
       before do
         @user = User.create(:name => "morita",:password => "pass")
