@@ -39,9 +39,13 @@ module Mongorilla
       c.instance_variable_set("@col",Collection.new(col_name))
 
       def initialize(doc)
-        @orig = doc.dup
-        @doc = doc
+        @orig = doc
+        @doc = Marshal.load(Marshal.dump(@orig))
         @changes={}
+      end
+
+      def origin
+        @orig
       end
 
       def changes
@@ -142,24 +146,23 @@ module Mongorilla
           reset
           return false
         end
-        if @changes
-          ret = self.class.collection.update(cond,@changes,opt)
-          if opt[:safe] && ret["n"] != 1
-            reset
-            return false
-          end
+        ret = self.class.collection.update(cond,@changes,opt)
+        if opt[:safe] && ret["n"] != 1
+          reset
+          return false
         end
         if mode == RELOAD
           reload
+          return true
         end
-        @orig = @doc.dup
+        @orig = Marshal.load(Marshal.dump(@doc))
         @changes={}
         true
       end
 
       def reset
         @changes={}
-        @doc = @orig.dup
+        @doc = Marshal.load(Marshal.dump(@orig))
       end
 
       def delete
@@ -168,8 +171,8 @@ module Mongorilla
 
       def reload
         @changes={}
-        @doc = self.class.collection.find_one(id,:master => true)
-        @orig = @doc.dup
+        @orig = self.class.collection.find_one(id,:master => true)
+        @doc = Marshal.load(Marshal.dump(@orig))
       end
 
       def c.collection
