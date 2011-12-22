@@ -28,6 +28,48 @@ module Mongorilla
       end
     end
 
+    def self.recursive_convert(m,trancefar)
+      case m
+      when Array
+        m.map{|a| recursive_convert(a,trancefar)}
+      when Hash
+        {}.tap{|h| m.each{|k,v| h[k.to_s] = recursive_convert(v,trancefar)}}
+      else
+        trancefar.call(m)
+      end
+    end
+
+    def self.convert
+      lambda{|m|
+        case m
+        when Time
+          m.localtime
+        when String
+          m.dup
+        when Symbol
+          m.to_s
+        else
+          m
+        end
+      }
+    end
+
+    def self.convert_string
+      lambda{|m|
+        case m
+        when String
+          m.dup
+        when Symbol
+          m.to_s
+        when BSON::ObjectId
+          m.to_s
+        else
+          m
+        end
+      }
+    end
+
+
     def self.included(c)
       fields = c.const_get("#{c}Fields")
       fields.each do |f|
@@ -40,8 +82,33 @@ module Mongorilla
 
       def initialize(doc)
         @orig = doc
-        @doc = Marshal.load(Marshal.dump(@orig))
+        @doc = Document.recursive_convert(@orig,Document.convert)
         @changes={}
+      end
+
+      def [](f)
+        send(f.to_sym)
+      end
+
+      def attributes
+        fields = self.class.const_get("#{self.class}Fields")
+        {}.tap{|h| fields.each{|f| h[f.to_s] = @doc[f.to_s]}}
+      end
+
+      def to_json
+        Document.recursive_convert(attributes,Document.convert_string).to_json
+      end
+
+      def to_yaml
+        Document.recursive_convert(attributes,Document.convert_string).to_yaml
+      end
+
+      def inspect
+        Document.recursive_convert(attributes,Document.convert_string).inspect
+      end
+
+      def to_s
+        inspect
       end
 
       def origin
@@ -54,10 +121,12 @@ module Mongorilla
 
       def set(f,v)
         send(f)
-        @doc[f] = v
+        @doc[f.to_s] = v
         @changes["$set"] ||= {}
-        @changes["$set"][f] = v
+        @changes["$set"][f.to_s] = v
       end
+
+      alias []= set
 
       def inc(f,v)
         @doc[f] = 0 unless send(f)

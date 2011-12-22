@@ -20,6 +20,8 @@ mongorilla accept single server or Master/Slave or Replica Set
   u.push("logs","bb")    #$push whithout update db yet 
   u.push("logs","cc")    #$push whithout update db yet 
   p u.logs               # ["ooooo","bb","cc"]
+  p u.password           # "hello"
+  p u["password"]        # "hello"
   u.inc("log_count",2)   #$inc +2 whithout update db yet 
   p u.log_count          # 3
   ret = u.save({:log_count => {"$lt" => 1}},Mongorilla::Document::SYNC) #update failed because log_count was 1.

@@ -1,0 +1,8 @@
+0.6.2
+*	add [] method
+*	add []= method
+* add attributes method
+* modify inspect
+* add to_json if json include
+* add to_yaml if yaml include
+* if field type is Time,return localtime

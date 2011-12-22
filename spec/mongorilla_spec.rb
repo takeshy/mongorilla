@@ -21,6 +21,7 @@ describe User do
     end
     it{@user.name.should == "morita"}
     it{@user.password.should == "pass"}
+    it{@user.attributes.should == {"_id" => @user.id,"name" => "morita","password" => "pass","log_count" => nil,"logs" => nil}}
   end
   context "find" do
     before do
