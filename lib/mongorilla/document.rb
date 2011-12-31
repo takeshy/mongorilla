@@ -1,4 +1,5 @@
 require File.expand_path("../collection.rb",__FILE__)
+require File.expand_path("../cursor.rb",__FILE__)
 module Mongorilla
   module Document
     RELOAD = :reload
@@ -255,7 +256,7 @@ module Mongorilla
         ret = @col.insert(data,opt)
         if opt[:safe] == true
           if ret.is_a? Array
-            ret.map{|uid| find(uid,:master=>true)}
+            find({:_id => {"$in" => ret}},:master=>true)
           elsif ret
             find(ret,:master=>true)
           end
@@ -280,8 +281,7 @@ module Mongorilla
           find_one(cond,opt)
         else
           ret = @col.find(cond,opt)
-          return [] if ret.count == 0
-          ret.map{|r| self.new(r)}
+          Cursor.new(self,ret)
         end
       end
 
