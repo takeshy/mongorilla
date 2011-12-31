@@ -5,6 +5,7 @@ module Mongorilla
     def [](idx)
       if idx < 0
         idx = @cursor.count + idx
+        return nil if idx < 0
       end
       return @members[idx] if @members[idx] 
       ret = @cursor.skip(idx).limit(1).first

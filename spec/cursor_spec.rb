@@ -22,6 +22,7 @@ describe User do
     end
     it{@users.count.should == 5}
     it{@users[0].name.should == "user1"}
+    it{@users[5].should == nil}
     it{@users[-1].name.should == "user5"}
     it{@users[-2].name.should == "user4"}
     it{@users.map{|u| u.name}.should == ["user1","user2","user3","user4","user5"]}
