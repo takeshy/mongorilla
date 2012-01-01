@@ -1,8 +1,9 @@
+0.8.2
+* no save object when use each method
 0.8.1
 * modify multiple [] access bug
 0.8.0
 *	find result array to cursor
-
 0.6.2
 *	add [] method
 *	add []= method

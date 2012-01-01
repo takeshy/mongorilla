@@ -16,9 +16,8 @@ module Mongorilla
     end
 
     def each
-      @cursor.each_with_index do|v,i|
-        @members[i] = @klass.new(v) unless @members[i]
-        yield @members[i]
+      @cursor.each do|v|
+        yield @klass.new(v)
       end
     end
 
