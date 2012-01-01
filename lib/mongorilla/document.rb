@@ -281,7 +281,7 @@ module Mongorilla
           find_one(cond,opt)
         else
           ret = @col.find(cond,opt)
-          Cursor.new(self,ret)
+          Cursor.new(self,ret,@col,cond,opt)
         end
       end
 
