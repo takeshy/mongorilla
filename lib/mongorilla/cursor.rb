@@ -15,6 +15,19 @@ module Mongorilla
       @members[idx] = ret ? @klass.new(ret) : nil
     end
 
+    def to_a
+      @cursor.map{|c| @klass.new(c)}
+    end
+
+
+    def to_yaml
+      to_a().map(&:to_hash).to_yaml
+    end
+
+    def to_json
+      to_a().map(&:to_hash).to_json
+    end
+
     def each
       @cursor.each do|v|
         yield @klass.new(v)

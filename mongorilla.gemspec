@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "mongorilla"
-  s.version = "0.8.2"
+  s.version = "0.8.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Takeshi Morita"]
-  s.date = "2012-01-01"
+  s.date = "2012-01-11"
   s.description = "Small Object Document Mapper for Mongo. you can update atomic  with condition"
   s.email = "laten@nifty.com"
   s.extra_rdoc_files = [

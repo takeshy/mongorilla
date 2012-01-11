@@ -3,6 +3,8 @@
 mongorilla is very small Object Document Mapper for mongo.
 mongorilla can update atomic  with condition.
 mongorilla accept single server or Master/Slave or Replica Set
+mongorilla does not manage relation. but you can create relation without difficulty.
+see mongorilla apli using relation https://github.com/takeshy/bookshelf-with-mongorilla
 
 === sample
   Mongorilla::Collection.build("/var/www/mongo_config.yml") #only one time when boot

@@ -96,16 +96,20 @@ module Mongorilla
         {}.tap{|h| fields.each{|f| h[f.to_s] = @doc[f.to_s]}}
       end
 
+      def to_hash
+        Document.recursive_convert(attributes,Document.convert_string)
+      end
+
       def to_json
-        Document.recursive_convert(attributes,Document.convert_string).to_json
+        to_hash.to_json
       end
 
       def to_yaml
-        Document.recursive_convert(attributes,Document.convert_string).to_yaml
+        to_hash.to_yaml
       end
 
       def inspect
-        Document.recursive_convert(attributes,Document.convert_string).inspect
+        to_hash.inspect
       end
 
       def to_s

@@ -1,3 +1,5 @@
+0.8.3
+* add method to_a,to_yaml,to_json for cursor.
 0.8.2
 * no save object when use each method
 0.8.1
